@@ -70,7 +70,44 @@ class Zoho {
             }
           }).catch(err => {
             reject(err);
-          })
+          });
+      }
+    });
+  }
+
+  async getRelatedRecords(parent, id, module) {
+    return new Promise((resolve, reject) => {
+      if (typeof id !== 'string') {
+        reject(new Error('id must be type string'));
+      } else {
+        let url = this.createUrl({
+          module,
+          actions: 'getRelatedRecords',
+          query: `id=${id}&parentModule=${parent}`
+        });
+
+        console.log(url);
+
+        this.fetch(url)
+          .then(response => {
+            if (response.error) {
+      	      reject(new Error(`${response.error.code}: ${response.error.message}`));
+      	    }
+            else if (response.nodata) {
+              // Send empty array because the results will be returned in an array
+              resolve([]);
+            }
+            else {
+              let array = response.result[module].row.FL;
+              let record = {};
+
+              array.forEach(field => record[field.val] = field.content);
+
+              resolve(record);
+            }
+          }).catch(err => {
+            reject(err);
+          });
       }
     });
   }
@@ -97,16 +134,28 @@ class Zoho {
               resolve([]);
             }
             else {
-              let array = response.result[module].row.FL;
-              let record = {};
+              let records = [];
+              if (Array.isArray(response.result[module].row)) {
+                response.result[module].row.forEach((row, index) => {
+                  let array = row.FL;
+                  let record = {};
 
-              array.forEach(field => record[field.val] = field.content);
+                  array.forEach(field => record[field.val] = field.content);
+                  records.push(record);
+                });
+              } else {
+                let array = response.result[module].row.FL;
+                let record = {};
 
-              resolve(record);
+                array.forEach(field => record[field.val] = field.content);
+                records.push(record);
+              }
+
+              resolve(records);
             }
           }).catch(err => {
             reject(err);
-          })
+          });
       }
     });
   }
