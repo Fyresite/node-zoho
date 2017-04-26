@@ -1,4 +1,4 @@
-import fetch from '../fetch';
+var fetch = require('node-fetch');
 
 class Zoho {
   constructor(apiKey, debug = false) {
@@ -40,7 +40,7 @@ class Zoho {
 			});
 	}
 
-  async getRecordById(module, id) {
+  getRecordById(module, id) {
     return new Promise((resolve, reject) => {
       if (typeof id !== 'string') {
         reject(new Error('id must be type string'));
@@ -75,7 +75,16 @@ class Zoho {
     });
   }
 
-  async getRelatedRecords(parent, id, module) {
+
+  /**
+   * getRelatedRecords - Gets records that are related to another
+   *
+   * @param  {string} parent the module you want to get the related record of
+   * @param  {string} id     the id of the parent record
+   * @param  {string} module the type of the related module
+   * @return {array}         an array of the related records
+   */
+   getRelatedRecords(parent, id, module) {
     return new Promise((resolve, reject) => {
       if (typeof id !== 'string') {
         reject(new Error('id must be type string'));
@@ -85,8 +94,6 @@ class Zoho {
           actions: 'getRelatedRecords',
           query: `id=${id}&parentModule=${parent}`
         });
-
-        console.log(url);
 
         this.fetch(url)
           .then(response => {
@@ -112,7 +119,19 @@ class Zoho {
     });
   }
 
-  async searchRecords(module, criteria) {
+  // TODO Finish insertRecords method
+  insertRecords(module, record) {
+    return new Promise((resolve, reject) => {
+      let url = this.createUrl({
+        module,
+        actions: 'insertRecords',
+      });
+
+
+    });
+  }
+
+  searchRecords(module, criteria) {
     return new Promise((resolve, reject) => {
       if (typeof criteria !== 'string') {
         reject(new Error('criteria must be type string'));
@@ -161,4 +180,4 @@ class Zoho {
   }
 }
 
-export default Zoho;
+module.exports = Zoho;
