@@ -55,6 +55,40 @@ describe('Zoho API', () => {
     });
   });
 
+  describe('#insertRecords', () => {
+    it('should insert records into the required Zoho CRM module', (done) => {
+      let contacts = [
+        {
+          'Account Name': 'Company Inc',
+          'Date of Birth': '02/28/1987',
+          'Description': 'This is a contact created by the node-test testing script',
+          'Email': 'fake@faker.com',
+          'First Name': 'Jared',
+          'Last Name': 'Larson'
+        },
+        {
+          'Account Name': 'Company Inc',
+          'Date of Birth': '06/18/1957',
+          'Description': 'This is a contact created by the node-test testing script',
+          'Email': 'hey@whoa.com',
+          'First Name': 'Don',
+          'Last Name': 'Darren'
+        }
+      ];
+
+      Zoho.insertRecords('Contacts', contacts)
+        .then(success => {
+          if (success) {
+            done();
+          } else {
+            done(new Error('There was something that happened.'));
+          }
+        }).catch(err => {
+          done(err);
+        });
+    });
+  });
+
   describe('#searchRecords', () => {
     it('should retrieve the records that match search criteria.', (done) => {
       Zoho.searchRecords('Contacts', '((First Name:John)AND(Last Name:Smith))')

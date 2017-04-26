@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Fyresite/node-zoho#readme",
   "dependencies": {
-    "isomorphic-fetch": "^2.2.1"
+    "isomorphic-fetch": "^2.2.1",
+    "jsontoxml": "0.0.11"
   }
 }

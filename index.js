@@ -1,4 +1,5 @@
-var fetch = require('node-fetch');
+let fetch   = require('node-fetch');
+let jsonxml = require('jsontoxml');
 
 class Zoho {
   constructor(apiKey, debug = false) {
@@ -105,10 +106,32 @@ class Zoho {
               resolve([]);
             }
             else {
-              let array = response.result[module].row.FL;
-              let record = {};
+              // console.log(response.result[module]);
+              // console.log('');
 
-              array.forEach(field => record[field.val] = field.content);
+              // If response.result[module].row is an array, there are multiple
+              // records returned, if not, it's just one record.
+              // Either way, we have to make sure that both are handled correctly
+              let results;
+
+              if (Array.isArray(response.result[module].row)) {
+                results = response.result[module].row;
+              } else {
+                results = [response.result[module].row];
+              }
+
+              let records = [];
+              let record;
+
+              results.forEach((row, index) => {
+                record = {};
+
+                row.FL.forEach((field, index) => {
+                  record[field.val] = field.content;
+                });
+
+                records.push(record);
+              });
 
               resolve(record);
             }
@@ -120,14 +143,62 @@ class Zoho {
   }
 
   // TODO Finish insertRecords method
-  insertRecords(module, record) {
+  insertRecords(module, records) {
     return new Promise((resolve, reject) => {
+
+      let json = {
+        [module]: []
+      };
+
+      if (!Array.isArray(records)) {
+        records = [records];
+      }
+
+      records.forEach((record, index) => {
+
+        let fieldList = [];
+
+        for (let prop in record) {
+          let val = record[prop];
+
+          fieldList.push({
+            name: 'FL',
+            attrs: {
+              val: prop
+            },
+            text: val
+          });
+        }
+
+        json[module].push({
+          name: 'row',
+          attrs: {
+            no: `${index + 1}`
+          },
+          children: fieldList
+        });
+      });
+
+      let xml = jsonxml(json);
+
       let url = this.createUrl({
         module,
         actions: 'insertRecords',
+        query: `xmlData=${xml}`
       });
 
-//
+      // console.log(url);
+
+      this.fetch(url)
+        .then(response => {
+          if (response.error) {
+            reject(new Error(`${response.error.code}: ${response.error.message}`));
+          } else {
+            resolve(true);
+          }
+        }).catch(err => {
+          reject(err);
+        });
     });
   }
 
