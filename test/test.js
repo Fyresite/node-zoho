@@ -69,7 +69,7 @@ describe('Zoho API', () => {
         {
           'Account Name': 'Company Inc',
           'Date of Birth': '06/18/1957',
-          'Description': 'This is a contact created by the node-test testing script',
+          'Description': 'This is a contact created by the node-test testing script &4@ wi!, >< a bunch of !*)$ bad C> ./{} characters.',
           'Email': 'hey@whoa.com',
           'First Name': 'Don',
           'Last Name': 'Darren'

@@ -1,5 +1,5 @@
-let fetch   = require('node-fetch');
-let jsonxml = require('jsontoxml');
+let fetch     = require('node-fetch');
+let jsonxml   = require('jsontoxml');
 
 class Zoho {
   constructor(apiKey, debug = false) {
@@ -40,6 +40,22 @@ class Zoho {
 				return err;
 			});
 	}
+
+  cleanUpXmlValue(val) {
+    if (/[&,]/.test(val)) {
+      // We need to apply the special CDATA tag to this val to make
+      // the xml valid for zoho.
+      //
+      // We might need to add more to this.
+
+      val = val.replace('&', '%26');
+      val = val.replace(',', '%2C');
+
+      val = `<![CDATA["${val}"]]>`;
+    }
+
+    return val;
+  }
 
   getRecordById(module, id) {
     return new Promise((resolve, reject) => {
@@ -159,7 +175,7 @@ class Zoho {
         let fieldList = [];
 
         for (let prop in record) {
-          let val = record[prop];
+          let val = this.cleanUpXmlValue(record[prop]);
 
           fieldList.push({
             name: 'FL',
