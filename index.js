@@ -48,8 +48,8 @@ class Zoho {
       //
       // We might need to add more to this.
 
-      val = val.replace('&', '%26');
-      val = val.replace(',', '%2C');
+      val = val.replace(/&/g, '%26');
+      val = val.replace(/,/g, '%2C');
 
       val = `<![CDATA["${val}"]]>`;
     }
